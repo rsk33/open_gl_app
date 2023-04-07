@@ -12,8 +12,9 @@ class Shader
         void createFromFile(const std::string& vShaderFileName, const
                 std::string& fShaderFileName);
 
-        GLuint getProjectionLocation() const;
         GLuint getModelLocation() const;
+        GLuint getProjectionLocation() const;
+        GLuint getViewLocation() const;
 
         void useShader() const;
         void clearShader();
@@ -23,6 +24,7 @@ class Shader
         GLuint shaderID;
         GLuint uniformModel;
         GLuint uniformProjection;
+        GLuint uniformView;
 
         std::string readFile(const std::string& fileName) const;
         void compileShader(const std::string& vCode, const std::string& fCode);

@@ -1,7 +1,10 @@
 #include <iostream>
+#include <array>
+#include <algorithm>
 #include <memory>
 #include <cstring>
 #include <cmath>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -11,18 +14,21 @@
 #include "mesh.h"
 #include "shader.h"
 #include "window.h"
+#include "camera.h"
+
 
 const GLint WIDTH = 800, HEIGHT = 600;
-
+Window mainWindow {WIDTH, HEIGHT};
+Camera camera {glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+    -90.0f, 0.0f, 5.0f, 0.5f};
 std::vector<std::unique_ptr<Mesh>> meshList;
 std::vector<std::unique_ptr<Shader>> shaderList;
-Window mainWindow {WIDTH, HEIGHT};
 
-bool direction = true;
-float triOffset = 0.0f;
-float triMaxOffset = 0.7f;
-float triIncrement = 0.005f;
-float currAngle = 0.0f;
+const std::string vShaderFileName = "shaders/shader.vert";
+const std::string fShaderFileName = "shaders/shader.frag";
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
 
 void createObjects()
 {
@@ -48,7 +54,7 @@ void createObjects()
 void createShaders()
 {
     std::unique_ptr<Shader> shader = std::make_unique<Shader>();
-    shader->createFromFile("shaders/shader.vert", "shaders/shader.frag");
+    shader->createFromFile(vShaderFileName, fShaderFileName);
     shaderList.emplace_back(std::move(shader));
 }
 
@@ -66,8 +72,16 @@ int main()
     // Loop until window closed
     while(!mainWindow.getShouldClose())
     {
+        GLfloat now = glfwGetTime();
+        deltaTime = now - lastTime;
+        lastTime = now;
+
         // Get & Handle user input events
         glfwPollEvents();
+
+        camera.keyControl(mainWindow.getKeys(), deltaTime);
+        camera.mouseControl(mainWindow.getResetXChange(),
+                mainWindow.getResetYChange());
 
         // Clear the window
         glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -77,6 +91,7 @@ int main()
 
         GLuint uniformModel = shaderList.front()->getModelLocation();
         GLuint uniformProjection = shaderList.front()->getProjectionLocation();
+        GLuint uniformView = shaderList.front()->getViewLocation();
 
         glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
@@ -84,6 +99,8 @@ int main()
         model = glm::scale(model, glm::vec3(0.5f, 1.0f, 1.0f));
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+                glm::value_ptr(camera.calculateViewMatrix()));
         meshList.front()->renderMesh();
 
         model = glm::mat4(1.0f);

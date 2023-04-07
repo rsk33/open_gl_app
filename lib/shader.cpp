@@ -8,7 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-Shader::Shader() : shaderID{0}, uniformModel{0}, uniformProjection{0} {}
+Shader::Shader() : shaderID{0}, uniformModel{0}, uniformProjection{0},
+    uniformView{0} {}
 
 void Shader::createFromString(const std::string& vCode, const std::string& fCode)
 {
@@ -27,14 +28,19 @@ void Shader::createFromFile(const std::string& vShaderFileName, const
     }
 }
 
+GLuint Shader::getModelLocation() const
+{
+    return uniformModel;
+}
+
 GLuint Shader::getProjectionLocation() const
 {
     return uniformProjection;
 }
 
-GLuint Shader::getModelLocation() const
+GLuint Shader::getViewLocation() const
 {
-    return uniformModel;
+    return uniformView;
 }
 
 void Shader::useShader() const
@@ -50,6 +56,7 @@ void Shader::clearShader()
         shaderID = 0;
         uniformModel = 0;   
         uniformProjection = 0;
+        uniformView = 0;
     }
 }
 
@@ -109,6 +116,7 @@ void Shader::compileShader(const std::string& vCode, const std::string& fCode)
     }
     uniformModel = glGetUniformLocation(shaderID, "model");
     uniformProjection = glGetUniformLocation(shaderID, "projection");
+    uniformView = glGetUniformLocation(shaderID, "view");
 }
 
 void Shader::addShader(const std::string& shaderCode, GLenum shaderType) const

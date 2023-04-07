@@ -2,12 +2,14 @@ set(LIB_SOURCES
     mesh.cpp
     shader.cpp
     window.cpp
+    camera.cpp
 )
 
 set(LIB_HEADERS
     mesh.h
     shader.h
     window.h
+    camera.h
 )
 
 set(LIB_INCLUDES
