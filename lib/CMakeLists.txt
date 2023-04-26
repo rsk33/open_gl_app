@@ -1,5 +1,6 @@
 set(LIB_SOURCES
     mesh.cpp
+    texture.cpp
     shader.cpp
     window.cpp
     camera.cpp
@@ -7,6 +8,7 @@ set(LIB_SOURCES
 
 set(LIB_HEADERS
     mesh.h
+    texture.h
     shader.h
     window.h
     camera.h
@@ -20,6 +22,7 @@ add_library(${LIB_NAME} STATIC ${LIB_SOURCES} ${LIB_HEADERS})
 
 target_include_directories(${LIB_NAME} PUBLIC
     ${LIB_INCLUDES}
+    "${CMAKE_SOURCE_DIR}/external"
     glfw
     GLEW::glew
 )
